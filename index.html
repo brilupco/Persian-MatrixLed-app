@@ -184,7 +184,8 @@
         background: radial-gradient(circle at top, #020617, #000000);
         border: 2px solid rgba(30, 64, 175, 0.7);
         position: relative;
-        overflow: hidden;
+        overflow-x: auto;   /* برای پنل‌های خیلی عریض: اسکرول افقی */
+        overflow-y: hidden;
       }
 
       .canvas-glow {
@@ -280,27 +281,31 @@
           const text =
             textInput.value.trim() || (lang === "fa" ? "متن نمونه" : "Sample");
 
-          // تنظیم ابعاد canvas (رزولوشن واقعی پنل)
+          // رزولوشن واقعی پنل
           canvas.width = width;
           canvas.height = height;
 
-          // تنظیم ابعاد نمایشی نسبت به ابعاد پنل
-          const MAX_DISPLAY_WIDTH = 800; // حداکثر عرض پیش‌نمایش (px)
-          const MAX_DISPLAY_HEIGHT = 240; // حداکثر ارتفاع پیش‌نمایش (px)
+          // ابعاد نمایشی: نسبت دقیق پنل + مناسب برای موبایل
+          const viewportWidth =
+            window.innerWidth ||
+            document.documentElement.clientWidth ||
+            400;
 
-          let scale = Math.floor(
-            Math.min(MAX_DISPLAY_WIDTH / width, MAX_DISPLAY_HEIGHT / height)
+          // ارتفاع نمایش (در px) متناسب با عرض صفحه
+          const displayHeight = Math.min(
+            220,
+            Math.max(80, viewportWidth * 0.35)
           );
-          if (scale < 8) scale = 8; // حداقل برای دیده شدن
+          const displayWidth = displayHeight * (width / height);
 
-          canvas.style.width = width * scale + "px";
-          canvas.style.height = height * scale + "px";
+          canvas.style.height = displayHeight + "px";
+          canvas.style.width = displayWidth + "px";
 
           // پس‌زمینه
           ctx.fillStyle = bgColor;
           ctx.fillRect(0, 0, width, height);
 
-          // تنظیم فونت براساس زبان
+          // فونت
           const fontFamily =
             lang === "fa" ? '"Vazirmatn", sans-serif' : '"Roboto", sans-serif';
           ctx.font = fontSize + "px " + fontFamily;
