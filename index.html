@@ -234,8 +234,9 @@
       document.addEventListener("DOMContentLoaded", () => {
         const resolutionSelect = document.getElementById("resolution");
         const langSelect = document.getElementById("lang");
-        const fontSizeInput = document.getElementById("fontSize");
+        const fontSizeSelect = document.getElementById("fontSize");
         const colorInput = document.getElementById("color");
+        const bgColorInput = document.getElementById("bgColor");
         const textInput = document.getElementById("text");
         const canvas = document.getElementById("ledCanvas");
         const downloadBtn = document.getElementById("downloadBtn");
@@ -271,19 +272,21 @@
           const { width, height } = getResolution();
           const lang = langSelect.value; // "fa" یا "en"
           const fontSize = Math.min(
-            Math.max(parseInt(fontSizeInput.value, 10) || 8, 4),
+            Math.max(parseInt(fontSizeSelect.value, 10) || 8, 4),
             height
           );
           const color = colorInput.value || "#00ff4c";
-          const text = textInput.value.trim() || (lang === "fa" ? "متن نمونه" : "Sample");
+          const bgColor = bgColorInput.value || "#000000";
+          const text =
+            textInput.value.trim() || (lang === "fa" ? "متن نمونه" : "Sample");
 
           // تنظیم ابعاد canvas (رزولوشن واقعی پنل)
           canvas.width = width;
           canvas.height = height;
 
           // تنظیم ابعاد نمایشی نسبت به ابعاد پنل
-          const MAX_DISPLAY_WIDTH = 800;   // حداکثر عرض پیش‌نمایش (px)
-          const MAX_DISPLAY_HEIGHT = 240;  // حداکثر ارتفاع پیش‌نمایش (px)
+          const MAX_DISPLAY_WIDTH = 800; // حداکثر عرض پیش‌نمایش (px)
+          const MAX_DISPLAY_HEIGHT = 240; // حداکثر ارتفاع پیش‌نمایش (px)
 
           let scale = Math.floor(
             Math.min(MAX_DISPLAY_WIDTH / width, MAX_DISPLAY_HEIGHT / height)
@@ -294,11 +297,12 @@
           canvas.style.height = height * scale + "px";
 
           // پس‌زمینه
-          ctx.fillStyle = "#000000";
+          ctx.fillStyle = bgColor;
           ctx.fillRect(0, 0, width, height);
 
           // تنظیم فونت براساس زبان
-          const fontFamily = lang === "fa" ? '"Vazirmatn", sans-serif' : '"Roboto", sans-serif';
+          const fontFamily =
+            lang === "fa" ? '"Vazirmatn", sans-serif' : '"Roboto", sans-serif';
           ctx.font = fontSize + "px " + fontFamily;
           ctx.fillStyle = color;
           ctx.textBaseline = "middle";
@@ -342,8 +346,9 @@
         // رویدادها
         resolutionSelect.addEventListener("change", render);
         langSelect.addEventListener("change", render);
-        fontSizeInput.addEventListener("input", render);
+        fontSizeSelect.addEventListener("change", render);
         colorInput.addEventListener("input", render);
+        bgColorInput.addEventListener("input", render);
         textInput.addEventListener("input", render);
         downloadBtn.addEventListener("click", downloadImage);
 
@@ -355,7 +360,7 @@
           window.addEventListener("load", () => {
             navigator.serviceWorker
               .register("./service-worker.js")
-              .catch(err => console.log("SW registration failed:", err));
+              .catch((err) => console.log("SW registration failed:", err));
           });
         }
       });
@@ -367,7 +372,8 @@
       <header>
         <h1>Persian Matrix LED Generator</h1>
         <p class="subtitle">
-          سایز پنل ماتریسی را انتخاب کن، متن فارسی یا انگلیسی بنویس، و خروجی را به‌صورت تصویر JPEG دانلود کن.
+          سایز پنل ماتریسی را انتخاب کن، متن فارسی یا انگلیسی بنویس، و خروجی را به‌صورت تصویر JPEG
+          دانلود کن.
         </p>
       </header>
 
@@ -378,7 +384,10 @@
 
           <div class="field">
             <label for="text">متن مورد نظر</label>
-            <textarea id="text" placeholder="مثلاً: به فروشگاه ما خوش آمدید"></textarea>
+            <textarea
+              id="text"
+              placeholder="مثلاً: به فروشگاه ما خوش آمدید"
+            ></textarea>
           </div>
 
           <div class="inline-fields">
@@ -405,19 +414,31 @@
           <div class="inline-fields">
             <div class="field">
               <label for="fontSize">اندازه فونت (پیکسل روی پنل)</label>
-              <input id="fontSize" type="number" min="4" max="16" value="10" />
-              <span class="hint">ارتفاع پنل 16 پیکسل است؛ اندازه بزرگ‌تر از 16 نمایش درستی نخواهد داشت.</span>
+              <select id="fontSize">
+                <option value="6">6</option>
+                <option value="8" selected>8</option>
+                <option value="10">10</option>
+                <option value="12">12</option>
+                <option value="14">14</option>
+                <option value="16">16</option>
+              </select>
+              <span class="hint">
+                ارتفاع پنل 16 پیکسل است؛ اندازه بزرگ‌تر از 16 نمایش درستی نخواهد داشت.
+              </span>
             </div>
 
             <div class="field">
               <label for="color">رنگ متن</label>
               <input id="color" type="color" value="#00ff4c" />
             </div>
+
+            <div class="field">
+              <label for="bgColor">رنگ پس‌زمینه</label>
+              <input id="bgColor" type="color" value="#000000" />
+            </div>
           </div>
 
-          <button id="downloadBtn" class="btn">
-            دانلود تصویر (JPEG)
-          </button>
+          <button id="downloadBtn" class="btn">دانلود تصویر (JPEG)</button>
           <div class="hint">
             تصویر خروجی دقیقاً با رزولوشن پنل انتخاب‌شده ذخیره می‌شود (مثلاً 16×32 پیکسل).
           </div>
