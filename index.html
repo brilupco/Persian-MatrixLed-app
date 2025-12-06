@@ -360,5 +360,83 @@
   <body>
     <div class="app">
       <header>
-        <h1>Persian Matr
+        <h1>Persian Matrix LED Generator</h1>
+        <p class="subtitle">
+          سایز پنل ماتریسی را انتخاب کن، متن فارسی یا انگلیسی بنویس، و خروجی را به‌صورت تصویر JPEG دانلود کن.
+        </p>
+      </header>
 
+      <div class="layout">
+        <!-- تنظیمات -->
+        <section class="card">
+          <h2 class="section-title">تنظیمات متن و پنل</h2>
+
+          <div class="field">
+            <label for="text">متن مورد نظر</label>
+            <textarea id="text" placeholder="مثلاً: به فروشگاه ما خوش آمدید"></textarea>
+          </div>
+
+          <div class="inline-fields">
+            <div class="field">
+              <label for="resolution">سایز پنل (پیکسل)</label>
+              <select id="resolution">
+                <option value="16x32">16 × 32</option>
+                <option value="16x64">16 × 64</option>
+                <option value="16x96">16 × 96</option>
+                <option value="16x144">16 × 144</option>
+                <option value="16x196">16 × 196</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="lang">زبان متن</label>
+              <select id="lang">
+                <option value="fa">فارسی</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="inline-fields">
+            <div class="field">
+              <label for="fontSize">اندازه فونت (پیکسل روی پنل)</label>
+              <input id="fontSize" type="number" min="4" max="16" value="10" />
+              <span class="hint">ارتفاع پنل 16 پیکسل است؛ اندازه بزرگ‌تر از 16 نمایش درستی نخواهد داشت.</span>
+            </div>
+
+            <div class="field">
+              <label for="color">رنگ متن</label>
+              <input id="color" type="color" value="#00ff4c" />
+            </div>
+          </div>
+
+          <button id="downloadBtn" class="btn">
+            دانلود تصویر (JPEG)
+          </button>
+          <div class="hint">
+            تصویر خروجی دقیقاً با رزولوشن پنل انتخاب‌شده ذخیره می‌شود (مثلاً 16×32 پیکسل).
+          </div>
+        </section>
+
+        <!-- پیش‌نمایش -->
+        <section class="card">
+          <h2 class="section-title">پیش‌نمایش پنل LED</h2>
+          <div class="preview-wrapper">
+            <div class="canvas-frame">
+              <div class="canvas-glow"></div>
+              <canvas id="ledCanvas"></canvas>
+            </div>
+            <div class="badge">
+              <span class="badge-dot"></span>
+              <span>خروجی JPEG | رزولوشن واقعی پنل | PWA-ready</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <footer>
+        می‌توانی این صفحه را روی موبایل به‌صورت PWA نصب کنی و آفلاین استفاده کنی.
+      </footer>
+    </div>
+  </body>
+</html>
