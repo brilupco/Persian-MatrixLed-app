@@ -263,24 +263,42 @@
           return { width: w, height: h };
         }
 
+        // شکست متن به چند خط، با توجه به:
+        // - شکستن پاراگراف‌ها بر اساس \n
+        // - شکستن هر پاراگراف بر اساس فاصله تا رسیدن به maxWidth
         function wrapText(ctx, text, maxWidth) {
           if (!text) return [""];
-          const words = text.split(" ");
+          const paragraphs = text.split(/\r?\n/);
           const lines = [];
-          let current = "";
 
-          for (const word of words) {
-            const test = current ? current + " " + word : word;
-            const width = ctx.measureText(test).width;
-            if (width > maxWidth && current) {
+          for (const para of paragraphs) {
+            const trimmed = para.trim();
+            if (trimmed === "") {
+              // خط خالی برای حفظ فاصله بین پاراگراف‌ها
+              lines.push("");
+              continue;
+            }
+
+            const words = trimmed.split(" ");
+            let current = "";
+
+            for (const word of words) {
+              const test = current ? current + " " + word : word;
+              const width = ctx.measureText(test).width;
+              if (width > maxWidth && current) {
+                lines.push(current);
+                current = word;
+              } else {
+                current = test;
+              }
+            }
+
+            if (current) {
               lines.push(current);
-              current = word;
-            } else {
-              current = test;
             }
           }
-          if (current) lines.push(current);
-          return lines;
+
+          return lines.length ? lines : [""];
         }
 
         function render() {
