@@ -286,14 +286,16 @@
         function render() {
           const { width, height } = getResolution();
           const lang = langSelect.value; // "fa" یا "en"
-          const fontSize = Math.min(
-            Math.max(parseInt(fontSizeSelect.value, 10) || 8, 4),
-            height
-          );
+
+          // اندازه فونت انتخابی، محدود به ارتفاع پنل
+          const baseSize = parseInt(fontSizeSelect.value, 10) || 8;
+          const fontSize = Math.min(Math.max(baseSize, 4), height);
+
           const color = colorInput.value || "#00ff4c";
           const bgColor = bgColorInput.value || "#000000";
           const text =
-            textInput.value.trim() || (lang === "fa" ? "متن نمونه" : "Sample");
+            textInput.value.trim() ||
+            (lang === "fa" ? "متن نمونه" : "Sample");
 
           // رزولوشن واقعی پنل
           canvas.width = width;
@@ -305,7 +307,6 @@
             document.documentElement.clientWidth ||
             400;
 
-          // ارتفاع نمایش (در px) متناسب با عرض صفحه
           const displayHeight = Math.min(
             220,
             Math.max(80, viewportWidth * 0.35)
@@ -319,19 +320,19 @@
           ctx.fillStyle = bgColor;
           ctx.fillRect(0, 0, width, height);
 
-          // فونت
+          // فونت و جهت
           const fontFamily =
-            lang === "fa" ? '"Vazirmatn", sans-serif' : '"Roboto", sans-serif';
+            lang === "fa"
+              ? '"Vazirmatn", sans-serif'
+              : '"Roboto", sans-serif';
           ctx.font = fontSize + "px " + fontFamily;
           ctx.fillStyle = color;
           ctx.textBaseline = "middle";
 
-          if (lang === "fa") {
-            ctx.textAlign = "right";
-          } else {
-            ctx.textAlign = "left";
-          }
+          ctx.direction = lang === "fa" ? "rtl" : "ltr";
+          ctx.textAlign = "center";
 
+          const centerX = width / 2;
           const marginX = 1;
           const maxTextWidth = width - marginX * 2;
 
@@ -342,13 +343,7 @@
 
           for (const line of lines) {
             const y = startY;
-            let x;
-            if (lang === "fa") {
-              x = width - marginX;
-            } else {
-              x = marginX;
-            }
-            ctx.fillText(line, x, y);
+            ctx.fillText(line, centerX, y);
             startY += lineHeight;
           }
         }
