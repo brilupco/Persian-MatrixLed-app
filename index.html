@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fa">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Persian LED App</title>
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#000000" />
+
+    <!-- App Description -->
+    <meta name="description" content="Persian LED Text Editor App" />
+
+    <!-- Manifest for PWA -->
+    <link rel="manifest" href="manifest.json" />
+
+    <!-- App Icons for iOS -->
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+
+    <!-- Persian Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IRANSans:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- English Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Register Service Worker -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/service-worker.js")
+            .then(() => console.log("Service Worker Registered"))
+            .catch(err => console.log("SW registration failed:", err));
+        });
+      }
+    </script>
+
+  </head>
+
+  <body>
+    <noscript>JavaScript is required to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
