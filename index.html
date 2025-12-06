@@ -263,57 +263,26 @@
           return { width: w, height: h };
         }
 
-        // شکست متن به چند خط، با توجه به:
-        // - شکستن پاراگراف‌ها بر اساس \n
-        // - شکستن هر پاراگراف بر اساس فاصله تا رسیدن به maxWidth
-        function wrapText(ctx, text, maxWidth) {
-          if (!text) return [""];
-          const paragraphs = text.split(/\r?\n/);
-          const lines = [];
-
-          for (const para of paragraphs) {
-            const trimmed = para.trim();
-            if (trimmed === "") {
-              // خط خالی برای حفظ فاصله بین پاراگراف‌ها
-              lines.push("");
-              continue;
-            }
-
-            const words = trimmed.split(" ");
-            let current = "";
-
-            for (const word of words) {
-              const test = current ? current + " " + word : word;
-              const width = ctx.measureText(test).width;
-              if (width > maxWidth && current) {
-                lines.push(current);
-                current = word;
-              } else {
-                current = test;
-              }
-            }
-
-            if (current) {
-              lines.push(current);
-            }
-          }
-
-          return lines.length ? lines : [""];
-        }
-
         function render() {
           const { width, height } = getResolution();
           const lang = langSelect.value; // "fa" یا "en"
 
-          // اندازه فونت انتخابی، محدود به ارتفاع پنل
+          // متن: فقط یک خط، همه Enterها و چند فاصله → یک فاصله
+          const rawText =
+            textInput.value ||
+            (lang === "fa" ? "متن نمونه" : "Sample");
+          const text =
+            rawText
+              .replace(/\r?\n/g, " ")
+              .replace(/\s+/g, " ")
+              .trim() || (lang === "fa" ? "متن نمونه" : "Sample");
+
+          // اندازه فونت انتخابی، فقط نسبت به ارتفاع پنل محدود می‌شود
           const baseSize = parseInt(fontSizeSelect.value, 10) || 8;
           const fontSize = Math.min(Math.max(baseSize, 4), height);
 
           const color = colorInput.value || "#00ff4c";
           const bgColor = bgColorInput.value || "#000000";
-          const text =
-            textInput.value.trim() ||
-            (lang === "fa" ? "متن نمونه" : "Sample");
 
           // رزولوشن واقعی پنل
           canvas.width = width;
@@ -343,27 +312,18 @@
             lang === "fa"
               ? '"Vazirmatn", sans-serif'
               : '"Roboto", sans-serif';
+
           ctx.font = fontSize + "px " + fontFamily;
           ctx.fillStyle = color;
           ctx.textBaseline = "middle";
-
           ctx.direction = lang === "fa" ? "rtl" : "ltr";
           ctx.textAlign = "center";
 
           const centerX = width / 2;
-          const marginX = 1;
-          const maxTextWidth = width - marginX * 2;
+          const centerY = height / 2;
 
-          const lines = wrapText(ctx, text, maxTextWidth);
-          const lineHeight = fontSize * 1.1;
-          const totalHeight = lines.length * lineHeight;
-          let startY = height / 2 - totalHeight / 2 + lineHeight / 2;
-
-          for (const line of lines) {
-            const y = startY;
-            ctx.fillText(line, centerX, y);
-            startY += lineHeight;
-          }
+          // فقط یک خط، وسط پنل؛ اگر طولانی باشد، از عرض کادر بیرون می‌زند
+          ctx.fillText(text, centerX, centerY);
         }
 
         function downloadImage() {
