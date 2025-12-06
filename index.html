@@ -122,9 +122,8 @@
       }
 
       select,
-      input[type="number"],
-      input[type="color"],
-      textarea {
+      input[type="text"],
+      input[type="color"] {
         border-radius: 10px;
         border: 1px solid var(--border);
         background: rgba(15, 23, 42, 0.95);
@@ -136,16 +135,10 @@
       }
 
       select:focus,
-      input[type="number"]:focus,
-      input[type="color"]:focus,
-      textarea:focus {
+      input[type="text"]:focus,
+      input[type="color"]:focus {
         border-color: var(--accent);
         box-shadow: 0 0 0 1px var(--accent-soft);
-      }
-
-      textarea {
-        min-height: 90px;
-        resize: vertical;
       }
 
       .inline-fields {
@@ -267,13 +260,12 @@
           const { width, height } = getResolution();
           const lang = langSelect.value; // "fa" یا "en"
 
-          // متن: فقط یک خط، همه Enterها و چند فاصله → یک فاصله
+          // متن: تک‌خطی، همه فاصله‌های اضافه حذف می‌شود
           const rawText =
             textInput.value ||
             (lang === "fa" ? "متن نمونه" : "Sample");
-          const text =
+          let text =
             rawText
-              .replace(/\r?\n/g, " ")
               .replace(/\s+/g, " ")
               .trim() || (lang === "fa" ? "متن نمونه" : "Sample");
 
@@ -322,8 +314,28 @@
           const centerX = width / 2;
           const centerY = height / 2;
 
-          // فقط یک خط، وسط پنل؛ اگر طولانی باشد، از عرض کادر بیرون می‌زند
-          ctx.fillText(text, centerX, centerY);
+          // حداکثر عرض مجاز متن روی پنل
+          const marginX = 1;
+          const maxTextWidth = width - marginX * 2;
+
+          // اگر جمله طولانی باشد، از انتهای جمله حذف می‌کنیم
+          let displayText = text;
+          let textWidth = ctx.measureText(displayText).width;
+
+          while (
+            displayText.length > 0 &&
+            textWidth > maxTextWidth
+          ) {
+            displayText = displayText.slice(0, -1); // حذف از آخر جمله
+            textWidth = ctx.measureText(displayText).width;
+          }
+
+          if (!displayText) {
+            // اگر خیلی شدید کوتاه شد، حداقل یک کاراکتر نگه داریم
+            displayText = text.charAt(0);
+          }
+
+          ctx.fillText(displayText, centerX, centerY);
         }
 
         function downloadImage() {
@@ -402,10 +414,14 @@
 
           <div class="field">
             <label for="text">متن مورد نظر</label>
-            <textarea
+            <input
               id="text"
+              type="text"
               placeholder="مثلاً: به فروشگاه ما خوش آمدید"
-            ></textarea>
+            />
+            <span class="hint">
+              متن فقط یک خط است؛ اگر از عرض پنل بیشتر شود، انتهای جمله به‌طور خودکار بریده می‌شود.
+            </span>
           </div>
 
           <div class="inline-fields">
@@ -441,8 +457,7 @@
                 <option value="16">16</option>
               </select>
               <span class="hint">
-                ارتفاع پنل 16 پیکسل است؛ اندازه بزرگ‌تر از 16 نمایش درستی
-                نخواهد داشت.
+                اگر جمله جا نشود، از انتهای آن حذف می‌شود؛ برای دیدن جمله‌ی کامل، فونت را کوچک‌تر کن یا جمله را در چند تصویر تقسیم کن.
               </span>
             </div>
 
