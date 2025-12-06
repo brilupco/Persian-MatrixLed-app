@@ -7,15 +7,24 @@
     <!-- Viewport & Theme -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta name="description" content="Generate LED panel text as JPEG image for different matrix sizes." />
+    <meta
+      name="description"
+      content="Generate LED panel text as JPEG image for different matrix sizes."
+    />
 
     <!-- PWA manifest & icon -->
     <link rel="manifest" href="./manifest.json" />
-    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="./icons/brilup-icon-192.png" />
 
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
 
     <style>
       :root {
@@ -37,7 +46,8 @@
         min-height: 100vh;
         background: radial-gradient(circle at top, #1f2937, #020617);
         color: var(--text);
-        font-family: "Vazirmatn", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-family: "Vazirmatn", system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
         display: flex;
         justify-content: center;
         align-items: stretch;
@@ -54,23 +64,7 @@
       }
 
       header {
-       <header>
-  <div style="display:flex; flex-direction:column; align-items:center; gap:8px; margin-bottom:8px;">
-    <img src="./icons/logo.png" 
-         alt="BrilUp Logo" 
-         style="width:90px; height:auto; border-radius:12px;" />
-
-    <div style="font-size:0.9rem; color:#22c55e; font-weight:600;">
-      قدرت گرفته از بریل‌آپ
-    </div>
-  </div>
-
-  <h1>Persian Matrix LED Generator</h1>
-  <p class="subtitle">
-    سایز پنل ماتریسی را انتخاب کن، متن فارسی یا انگلیسی بنویس، و خروجی را به‌صورت تصویر JPEG دانلود کن.
-  </p>
-</header>
-
+        text-align: center;
       }
 
       h1 {
@@ -98,7 +92,11 @@
       }
 
       .card {
-        background: linear-gradient(135deg, rgba(11, 17, 32, 0.98), rgba(15, 23, 42, 0.95));
+        background: linear-gradient(
+          135deg,
+          rgba(11, 17, 32, 0.98),
+          rgba(15, 23, 42, 0.95)
+        );
         border-radius: 18px;
         padding: 16px;
         border: 1px solid var(--border);
@@ -200,7 +198,7 @@
         background: radial-gradient(circle at top, #020617, #000000);
         border: 2px solid rgba(30, 64, 175, 0.7);
         position: relative;
-        overflow-x: auto;   /* برای پنل‌های خیلی عریض: اسکرول افقی */
+        overflow-x: auto; /* برای پنل‌های خیلی عریض: اسکرول افقی */
         overflow-y: hidden;
       }
 
@@ -391,10 +389,36 @@
   <body>
     <div class="app">
       <header>
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+          "
+        >
+          <img
+            src="./icons/brilup-icon-192.png"
+            alt="BrilUp Logo"
+            style="width: 90px; height: auto; border-radius: 12px"
+          />
+
+          <div
+            style="
+              font-size: 0.9rem;
+              color: #22c55e;
+              font-weight: 600;
+            "
+          >
+            قدرت گرفته از بریل‌آپ
+          </div>
+        </div>
+
         <h1>Persian Matrix LED Generator</h1>
         <p class="subtitle">
-          سایز پنل ماتریسی را انتخاب کن، متن فارسی یا انگلیسی بنویس، و خروجی را به‌صورت تصویر JPEG
-          دانلود کن.
+          سایز پنل ماتریسی را انتخاب کن، متن فارسی یا انگلیسی بنویس، و خروجی
+          را به‌صورت تصویر JPEG دانلود کن.
         </p>
       </header>
 
@@ -444,7 +468,8 @@
                 <option value="16">16</option>
               </select>
               <span class="hint">
-                ارتفاع پنل 16 پیکسل است؛ اندازه بزرگ‌تر از 16 نمایش درستی نخواهد داشت.
+                ارتفاع پنل 16 پیکسل است؛ اندازه بزرگ‌تر از 16 نمایش درستی
+                نخواهد داشت.
               </span>
             </div>
 
@@ -461,7 +486,8 @@
 
           <button id="downloadBtn" class="btn">دانلود تصویر (JPEG)</button>
           <div class="hint">
-            تصویر خروجی دقیقاً با رزولوشن پنل انتخاب‌شده ذخیره می‌شود (مثلاً 16×32 پیکسل).
+            تصویر خروجی دقیقاً با رزولوشن پنل انتخاب‌شده ذخیره می‌شود (مثلاً
+            16×32 پیکسل).
           </div>
         </section>
 
@@ -482,9 +508,9 @@
       </div>
 
       <footer>
-        می‌توانی این صفحه را روی موبایل به‌صورت PWA نصب کنی و آفلاین استفاده کنی.
+        می‌توانی این صفحه را روی موبایل به‌صورت PWA نصب کنی و آفلاین استفاده
+        کنی.
       </footer>
     </div>
   </body>
 </html>
-
