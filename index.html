@@ -1,47 +1,360 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="fa" dir="rtl">
   <head>
     <meta charset="utf-8" />
+    <title>Persian Matrix LED App</title>
+
+    <!-- Viewport & Theme -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <title>Persian LED App</title>
-
-    <!-- Theme Color -->
     <meta name="theme-color" content="#000000" />
-
-    <!-- App Description -->
     <meta name="description" content="Persian LED Text Editor App" />
 
-    <!-- Manifest for PWA -->
-    <link rel="manifest" href="manifest.json" />
+    <!-- PWA -->
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
 
-    <!-- App Icons for iOS -->
-    <link rel="apple-touch-icon" href="icons/icon-192.png" />
-
-    <!-- Persian Fonts -->
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=IRANSans:wght@400;700&display=swap" rel="stylesheet">
 
-    <!-- English Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-
-    <!-- Register Service Worker -->
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker.register("/service-worker.js")
-            .then(() => console.log("Service Worker Registered"))
-            .catch(err => console.log("SW registration failed:", err));
-        });
+    <style>
+      :root {
+        --bg: #050816;
+        --card: #0f172a;
+        --accent: #22c55e;
+        --accent-soft: rgba(34, 197, 94, 0.2);
+        --text: #e5e7eb;
+        --text-muted: #9ca3af;
       }
-    </script>
 
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Vazirmatn", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, #1f2937, #020617);
+        color: var(--text);
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+      }
+
+      .app {
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .header {
+        text-align: center;
+      }
+
+      .title {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+
+      .subtitle {
+        margin: 4px 0 0;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+
+      .card {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.85));
+        border-radius: 18px;
+        padding: 16px;
+        box-shadow: 0 20px 35px rgba(0, 0, 0, 0.45);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+      }
+
+      .field-label {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 80px;
+        resize: vertical;
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        padding: 10px 12px;
+        font-family: inherit;
+        font-size: 1rem;
+        background: rgba(15, 23, 42, 0.9);
+        color: var(--text);
+        outline: none;
+      }
+
+      textarea:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.4);
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+        align-items: center;
+      }
+
+      .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+
+      .control-group input[type="number"],
+      .control-group input[type="range"],
+      .control-group select {
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        padding: 4px 10px;
+        font-size: 0.85rem;
+        background: rgba(15, 23, 42, 0.95);
+        color: var(--text);
+        outline: none;
+      }
+
+      .preview-card {
+        margin-top: 6px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .led-frame {
+        background: radial-gradient(circle at top, #020617, #000000);
+        border-radius: 18px;
+        padding: 16px;
+        border: 2px solid rgba(148, 163, 184, 0.35);
+        position: relative;
+      }
+
+      .led-border-glow {
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        border: 1px solid rgba(34, 197, 94, 0.6);
+        opacity: 0.4;
+        pointer-events: none;
+      }
+
+      .led-grid {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 120px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .led-text {
+        white-space: nowrap;
+        font-weight: 700;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        text-shadow:
+          0 0 4px rgba(34, 197, 94, 0.9),
+          0 0 10px rgba(34, 197, 94, 0.8),
+          0 0 18px rgba(22, 163, 74, 0.9);
+      }
+
+      .led-text.red {
+        color: #f97373;
+        text-shadow:
+          0 0 4px rgba(248, 113, 113, 0.9),
+          0 0 10px rgba(220, 38, 38, 0.8),
+          0 0 18px rgba(248, 113, 113, 1);
+      }
+
+      .led-text.blue {
+        color: #60a5fa;
+        text-shadow:
+          0 0 4px rgba(96, 165, 250, 0.9),
+          0 0 10px rgba(37, 99, 235, 0.8),
+          0 0 18px rgba(59, 130, 246, 1);
+      }
+
+      .led-text.amber {
+        color: #fbbf24;
+        text-shadow:
+          0 0 4px rgba(251, 191, 36, 0.9),
+          0 0 10px rgba(245, 158, 11, 0.8),
+          0 0 18px rgba(234, 179, 8, 1);
+      }
+
+      .ticker {
+        animation: scroll-left linear infinite;
+      }
+
+      @keyframes scroll-left {
+        from {
+          transform: translateX(100%);
+        }
+        to {
+          transform: translateX(-100%);
+        }
+      }
+
+      .footer {
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        font-size: 0.75rem;
+        margin-top: 6px;
+      }
+
+      .badge-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: var(--accent);
+        box-shadow: 0 0 8px rgba(34, 197, 94, 0.9);
+      }
+
+      @media (max-width: 600px) {
+        .title {
+          font-size: 1.3rem;
+        }
+      }
+    </style>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const textInput = document.getElementById("text-input");
+        const speedInput = document.getElementById("speed");
+        const sizeInput = document.getElementById("size");
+        const colorSelect = document.getElementById("color");
+        const modeSelect = document.getElementById("mode");
+        const ledText = document.getElementById("led-text");
+
+        function updatePreview() {
+          const text = textInput.value || "سلام! متن خودت را بنویس 😊";
+          ledText.textContent = text;
+
+          // رنگ
+          const color = colorSelect.value;
+          ledText.className = "led-text " + color;
+
+          // اندازه
+          const size = parseInt(sizeInput.value, 10) || 24;
+          ledText.style.fontSize = size + "px";
+
+          // حالت حرکت
+          const mode = modeSelect.value;
+          if (mode === "static") {
+            ledText.classList.remove("ticker");
+          } else {
+            ledText.classList.add("ticker");
+            const speed = parseFloat(speedInput.value) || 8;
+            const duration = 16 / speed;
+            ledText.style.animationDuration = duration + "s";
+          }
+        }
+
+        textInput.addEventListener("input", updatePreview);
+        speedInput.addEventListener("input", updatePreview);
+        sizeInput.addEventListener("input", updatePreview);
+        colorSelect.addEventListener("change", updatePreview);
+        modeSelect.addEventListener("change", updatePreview);
+
+        updatePreview();
+
+        // Service Worker for PWA (مسیر نسبی برای GitHub Pages)
+        if ("serviceWorker" in navigator) {
+          window.addEventListener("load", () => {
+            navigator.serviceWorker
+              .register("./service-worker.js")
+              .catch(err => console.log("SW registration failed:", err));
+          });
+        }
+      });
+    </script>
   </head>
 
   <body>
-    <noscript>JavaScript is required to run this app.</noscript>
-    <div id="root"></div>
+    <div class="app">
+      <header class="header">
+        <h1 class="title">Persian Matrix LED</h1>
+        <p class="subtitle">متن فارسی را بنویس، تنظیم کن و روی تابلو LED پیاده‌سازی کن.</p>
+      </header>
+
+      <main class="card">
+        <div class="field">
+          <div class="field-label">متن نمایش روی LED</div>
+          <textarea id="text-input" placeholder="مثلاً: خوش آمدید، امروز تخفیف ویژه داریم!"></textarea>
+        </div>
+
+        <div class="controls">
+          <div class="control-group">
+            <span>حالت نمایش</span>
+            <select id="mode">
+              <option value="ticker">اسکرول افقی</option>
+              <option value="static">ثابت</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <span>سرعت حرکت</span>
+            <input id="speed" type="number" min="1" max="20" value="8" />
+          </div>
+
+          <div class="control-group">
+            <span>اندازه متن</span>
+            <input id="size" type="number" min="10" max="72" value="28" />
+          </div>
+
+          <div class="control-group">
+            <span>رنگ LED</span>
+            <select id="color">
+              <option value="">سبز</option>
+              <option value="red">قرمز</option>
+              <option value="blue">آبی</option>
+              <option value="amber">کهربایی</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="preview-card">
+          <div class="led-frame">
+            <div class="led-border-glow"></div>
+            <div class="led-grid">
+              <div id="led-text" class="led-text"></div>
+            </div>
+          </div>
+          <div class="badge">
+            <span class="badge-dot"></span>
+            <span>Offline Ready PWA</span>
+          </div>
+        </div>
+      </main>
+
+      <footer class="footer">
+        این نسخه‌ی آزمایشی برای تست رابط کاربری و نصب به‌صورت PWA است.
+      </footer>
+    </div>
   </body>
 </html>
