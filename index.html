@@ -241,9 +241,6 @@
         const downloadBtn = document.getElementById("downloadBtn");
         const ctx = canvas.getContext("2d");
 
-        // مقیاس برای نمایش روی صفحه (خود رزولوشن داخلی همان تعداد پیکسل پنل است)
-        const DISPLAY_SCALE = 20;
-
         function getResolution() {
           const value = resolutionSelect.value; // مثلا "16x32"
           const [h, w] = value.split("x").map(Number);
@@ -284,9 +281,17 @@
           canvas.width = width;
           canvas.height = height;
 
-          // تنظیم ابعاد نمایشی (برای دیده شدن روی صفحه)
-          canvas.style.width = width * DISPLAY_SCALE + "px";
-          canvas.style.height = height * DISPLAY_SCALE + "px";
+          // تنظیم ابعاد نمایشی نسبت به ابعاد پنل
+          const MAX_DISPLAY_WIDTH = 800;   // حداکثر عرض پیش‌نمایش (px)
+          const MAX_DISPLAY_HEIGHT = 240;  // حداکثر ارتفاع پیش‌نمایش (px)
+
+          let scale = Math.floor(
+            Math.min(MAX_DISPLAY_WIDTH / width, MAX_DISPLAY_HEIGHT / height)
+          );
+          if (scale < 8) scale = 8; // حداقل برای دیده شدن
+
+          canvas.style.width = width * scale + "px";
+          canvas.style.height = height * scale + "px";
 
           // پس‌زمینه
           ctx.fillStyle = "#000000";
@@ -326,7 +331,7 @@
         }
 
         function downloadImage() {
-          render(); // مطمئن شو آخرین تغییرات روی canvas هست
+          render(); // آخرین وضعیت روی canvas
           const { width, height } = getResolution();
           const link = document.createElement("a");
           link.download = `led_${height}x${width}.jpg`;
@@ -345,7 +350,7 @@
         // رندر اولیه
         render();
 
-        // ثبت Service Worker برای PWA (مسیر نسبی برای GitHub Pages)
+        // ثبت Service Worker برای PWA
         if ("serviceWorker" in navigator) {
           window.addEventListener("load", () => {
             navigator.serviceWorker
