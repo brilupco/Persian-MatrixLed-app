@@ -177,7 +177,6 @@
         font-size: 0.75rem;
         color: var(--muted);
         margin-top: 4px;
-        line-height: 1.6;
       }
 
       .preview-wrapper {
@@ -249,7 +248,6 @@
         const textInput = document.getElementById("text");
         const canvas = document.getElementById("ledCanvas");
         const downloadBtn = document.getElementById("downloadBtn");
-        const metricsEl = document.getElementById("metrics");
         const ctx = canvas.getContext("2d");
 
         function getResolution() {
@@ -272,7 +270,7 @@
               .trim() || (lang === "fa" ? "متن نمونه" : "Sample");
 
           // اندازه فونت انتخابی، فقط نسبت به ارتفاع پنل محدود می‌شود
-          const baseSize = parseInt(fontSizeSelect.value, 10) || 10;
+          const baseSize = parseInt(fontSizeSelect.value, 10) || 8;
           const fontSize = Math.min(Math.max(baseSize, 4), height);
 
           const color = colorInput.value || "#00ff4c";
@@ -320,57 +318,24 @@
           const marginX = 1;
           const maxTextWidth = width - marginX * 2;
 
-          // عرض متن کامل (بدون برش)
-          const fullWidth = ctx.measureText(text).width;
-
           // اگر جمله طولانی باشد، از انتهای جمله حذف می‌کنیم
           let displayText = text;
-          let displayWidth = fullWidth;
+          let textWidth = ctx.measureText(displayText).width;
 
           while (
             displayText.length > 0 &&
-            displayWidth > maxTextWidth
+            textWidth > maxTextWidth
           ) {
             displayText = displayText.slice(0, -1); // حذف از آخر جمله
-            displayWidth = ctx.measureText(displayText).width;
+            textWidth = ctx.measureText(displayText).width;
           }
 
           if (!displayText) {
             // اگر خیلی شدید کوتاه شد، حداقل یک کاراکتر نگه داریم
             displayText = text.charAt(0);
-            displayWidth = ctx.measureText(displayText).width;
           }
 
-          // رسم متن
           ctx.fillText(displayText, centerX, centerY);
-
-          // به‌روزرسانی شمارنده پیکسلی زیر پیش‌نمایش
-          if (metricsEl) {
-            const usableWidth = maxTextWidth;
-            const overflowPx = Math.max(
-              0,
-              Math.round(fullWidth - usableWidth)
-            );
-
-            metricsEl.textContent =
-              "عرض پنل: " +
-              width +
-              " پیکسل" +
-              " | ناحیه قابل‌استفاده متن: " +
-              Math.round(usableWidth) +
-              " پیکسل" +
-              " | عرض متن واردشده: " +
-              Math.round(fullWidth) +
-              " پیکسل" +
-              " | عرض متن قابل‌نمایش: " +
-              Math.round(displayWidth) +
-              " پیکسل" +
-              (overflowPx > 0
-                ? " | متن حدود " +
-                  overflowPx +
-                  " پیکسل از انتها کوتاه شده است."
-                : " | متن کامل در پنل جا شده است.");
-          }
         }
 
         function downloadImage() {
@@ -455,7 +420,7 @@
               placeholder="مثلاً: به فروشگاه ما خوش آمدید"
             />
             <span class="hint">
-              متن فقط یک خط است؛ اگر از عرض پنل بیشتر شود، انتهای جمله به‌طور خودکار بریده می‌شود و مقدار برش در پایین پیش‌نمایش نشان داده می‌شود.
+              متن فقط یک خط است؛ اگر از عرض پنل بیشتر شود، انتهای جمله به‌طور خودکار بریده می‌شود.
             </span>
           </div>
 
@@ -484,13 +449,15 @@
             <div class="field">
               <label for="fontSize">اندازه فونت (پیکسل روی پنل)</label>
               <select id="fontSize">
-                <option value="10" selected>10</option>
+                <option value="6">6</option>
+                <option value="8" selected>8</option>
+                <option value="10">10</option>
                 <option value="12">12</option>
                 <option value="14">14</option>
                 <option value="16">16</option>
               </select>
               <span class="hint">
-                اگر می‌خواهی جمله کامل نمایش داده شود، می‌توانی اندازه فونت را کمتر انتخاب کنی یا متن را در چند تصویر جداگانه تقسیم کنی.
+                اگر جمله جا نشود، از انتهای آن حذف می‌شود؛ برای دیدن جمله‌ی کامل، فونت را کوچک‌تر کن یا جمله را در چند تصویر تقسیم کن.
               </span>
             </div>
 
@@ -520,12 +487,6 @@
               <div class="canvas-glow"></div>
               <canvas id="ledCanvas"></canvas>
             </div>
-
-            <!-- شمارنده پیکسلی -->
-            <div id="metrics" class="hint">
-              <!-- مقدار این بخش توسط جاوااسکریپت پر می‌شود -->
-            </div>
-
             <div class="badge">
               <span class="badge-dot"></span>
               <span>خروجی JPEG | رزولوشن واقعی پنل | PWA-ready</span>
