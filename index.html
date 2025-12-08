@@ -4,19 +4,23 @@
     <meta charset="utf-8" />
     <title>Persian Matrix LED Generator</title>
 
-    <!-- Viewport & Theme -->
+    <!-- Viewport -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+
+    <!-- توضیحات -->
     <meta
       name="description"
       content="Generate LED panel text as JPEG image for different matrix sizes."
     />
 
-    <!-- PWA manifest & icon -->
+    <!-- فقط manifest (بدون service worker فعلاً) -->
     <link rel="manifest" href="./manifest.json" />
+
+    <!-- آیکون PWA / favicon -->
+    <link rel="icon" type="image/png" href="./icons/brilup-icon-192.png" />
     <link rel="apple-touch-icon" href="./icons/brilup-icon-192.png" />
 
-    <!-- Fonts -->
+    <!-- فونت‌ها -->
     <link
       href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap"
       rel="stylesheet"
@@ -30,7 +34,7 @@
       :root {
         --bg: #020617;
         --card: #0b1120;
-        --accent: #f97316; /* نارنجی پررنگ */
+        --accent: #f97316; /* نارنجی */
         --accent-soft: rgba(249, 115, 22, 0.18);
         --text: #e5e7eb;
         --muted: #9ca3af;
@@ -288,7 +292,9 @@
               placeholder="مثلاً: به فروشگاه ما خوش آمدید"
             />
             <span class="hint">
-              متن فقط یک خط است؛ اگر از عرض پنل بیشتر شود، انتهای جمله به‌طور خودکار بریده می‌شود و مقدار برش در پایین پیش‌نمایش نشان داده می‌شود.
+              متن فقط یک خط است؛ اگر از عرض پنل بیشتر شود، انتهای جمله به‌طور
+              خودکار بریده می‌شود و مقدار برش در پایین پیش‌نمایش نشان داده
+              می‌شود.
             </span>
           </div>
 
@@ -360,15 +366,15 @@
 
             <div class="badge">
               <span class="badge-dot"></span>
-              <span>خروجی JPEG | رزولوشن واقعی پنل | PWA-ready</span>
+              <span>خروجی JPEG | رزولوشن واقعی پنل</span>
             </div>
           </div>
         </section>
       </div>
 
       <footer>
-        می‌توانی این صفحه را روی موبایل به‌صورت PWA نصب کنی و آفلاین استفاده
-        کنی.
+        این ابزار صرفاً در مرورگر اجرا می‌شود؛ بعداً می‌توانیم PWA را دوباره
+        فعال کنیم.
       </footer>
     </div>
 
@@ -384,26 +390,10 @@
         const downloadBtn = document.getElementById("downloadBtn");
         const metricsEl = document.getElementById("metrics");
 
-        if (
-          !resolutionSelect ||
-          !langSelect ||
-          !fontSizeSelect ||
-          !colorInput ||
-          !bgColorInput ||
-          !textInput ||
-          !canvas ||
-          !downloadBtn ||
-          !metricsEl
-        ) {
-          console.error("Some DOM elements are missing.");
+        if (!canvas || !canvas.getContext) {
           return;
         }
-
         const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          console.error("Canvas context not available.");
-          return;
-        }
 
         function getResolution() {
           const value = resolutionSelect.value || "16x32";
@@ -417,7 +407,6 @@
           const { width, height } = getResolution();
           const lang = langSelect.value || "fa";
 
-          // متن تک‌خطی
           const rawText =
             textInput.value ||
             (lang === "fa" ? "متن نمونه" : "Sample");
@@ -434,7 +423,7 @@
           canvas.width = width;
           canvas.height = height;
 
-          // برای حالت عمودی: عرض را به عرض صفحه محدود می‌کنیم
+          // مقیاس نمایش بر اساس عرض صفحه (برای حالت عمودی موبایل)
           const viewportWidth =
             window.innerWidth ||
             document.documentElement.clientWidth ||
@@ -447,7 +436,6 @@
           canvas.style.width = displayWidth + "px";
           canvas.style.height = displayHeight + "px";
 
-          // پس‌زمینه
           ctx.fillStyle = bgColor;
           ctx.fillRect(0, 0, width, height);
 
@@ -459,7 +447,6 @@
           ctx.font = fontSize + "px " + fontFamily;
           ctx.fillStyle = color;
           ctx.textBaseline = "middle";
-          ctx.direction = lang === "fa" ? "rtl" : "ltr";
           ctx.textAlign = "center";
 
           const centerX = width / 2;
@@ -470,7 +457,6 @@
 
           const fullWidth = ctx.measureText(text).width;
 
-          // برش از انتهای متن
           let displayText = text;
           let displayWidth = fullWidth;
 
@@ -489,7 +475,6 @@
 
           ctx.fillText(displayText, centerX, centerY);
 
-          // متریک‌ها
           const usableWidth = maxTextWidth;
           const overflowPx = Math.max(
             0,
@@ -536,15 +521,6 @@
 
         // رندر اولیه
         render();
-
-        // Service Worker برای PWA
-        if ("serviceWorker" in navigator) {
-          navigator.serviceWorker
-            .register("./service-worker.js")
-            .catch(function (err) {
-              console.log("SW registration failed:", err);
-            });
-        }
       });
     </script>
   </body>
