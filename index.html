@@ -192,14 +192,14 @@
         background: radial-gradient(circle at top, #020617, #000000);
         border: 2px solid rgba(30, 64, 175, 0.7);
         position: relative;
-        overflow: hidden; /* دیگر اسکرول افقی لازم نیست */
+        overflow: hidden;
       }
 
       .canvas-glow {
         position: absolute;
         inset: -1px;
         border-radius: inherit;
-        border: 1px solid rgba(249, 115, 22, 0.7); /* نارنجی */
+        border: 1px solid rgba(249, 115, 22, 0.7);
         opacity: 0.45;
         pointer-events: none;
       }
@@ -356,9 +356,7 @@
             </div>
 
             <!-- شمارنده پیکسلی -->
-            <div id="metrics" class="hint">
-              <!-- مقدار این بخش توسط جاوااسکریپت پر می‌شود -->
-            </div>
+            <div id="metrics" class="hint"></div>
 
             <div class="badge">
               <span class="badge-dot"></span>
@@ -374,9 +372,8 @@
       </footer>
     </div>
 
-    <!-- اسکریپت در انتهای body -->
     <script>
-      function initLedApp() {
+      window.addEventListener("load", function () {
         const resolutionSelect = document.getElementById("resolution");
         const langSelect = document.getElementById("lang");
         const fontSizeSelect = document.getElementById("fontSize");
@@ -387,10 +384,26 @@
         const downloadBtn = document.getElementById("downloadBtn");
         const metricsEl = document.getElementById("metrics");
 
-        if (!canvas || !canvas.getContext) {
+        if (
+          !resolutionSelect ||
+          !langSelect ||
+          !fontSizeSelect ||
+          !colorInput ||
+          !bgColorInput ||
+          !textInput ||
+          !canvas ||
+          !downloadBtn ||
+          !metricsEl
+        ) {
+          console.error("Some DOM elements are missing.");
           return;
         }
+
         const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          console.error("Canvas context not available.");
+          return;
+        }
 
         function getResolution() {
           const value = resolutionSelect.value || "16x32";
@@ -404,7 +417,7 @@
           const { width, height } = getResolution();
           const lang = langSelect.value || "fa";
 
-          // متن تک‌خطی، تمیز کردن فاصله‌ها
+          // متن تک‌خطی
           const rawText =
             textInput.value ||
             (lang === "fa" ? "متن نمونه" : "Sample");
@@ -412,24 +425,22 @@
             rawText.replace(/\s+/g, " ").trim() ||
             (lang === "fa" ? "متن نمونه" : "Sample");
 
-          // اندازه فونت
           const baseSize = parseInt(fontSizeSelect.value, 10) || 10;
           const fontSize = Math.min(Math.max(baseSize, 4), height);
 
           const color = colorInput.value || "#00ff4c";
           const bgColor = bgColorInput.value || "#000000";
 
-          // اندازه واقعی canvas
           canvas.width = width;
           canvas.height = height;
 
-          // مقیاس نمایش: بر اساس عرض صفحه برای پشتیبانی عمودی روی موبایل
+          // برای حالت عمودی: عرض را به عرض صفحه محدود می‌کنیم
           const viewportWidth =
             window.innerWidth ||
             document.documentElement.clientWidth ||
             400;
 
-          const maxDisplayWidth = Math.min(viewportWidth - 32, 600); // کمی حاشیه
+          const maxDisplayWidth = Math.min(viewportWidth - 32, 600);
           const displayWidth = maxDisplayWidth;
           const displayHeight = displayWidth * (height / width);
 
@@ -440,7 +451,6 @@
           ctx.fillStyle = bgColor;
           ctx.fillRect(0, 0, width, height);
 
-          // فونت و جهت
           const fontFamily =
             lang === "fa"
               ? '"Vazirmatn", sans-serif'
@@ -455,14 +465,12 @@
           const centerX = width / 2;
           const centerY = height / 2;
 
-          // محدودیت عرض متن
           const marginX = 1;
           const maxTextWidth = width - marginX * 2;
 
-          // عرض متن کامل
           const fullWidth = ctx.measureText(text).width;
 
-          // برش از انتهای متن اگر طولانی باشد
+          // برش از انتهای متن
           let displayText = text;
           let displayWidth = fullWidth;
 
@@ -479,36 +487,33 @@
             displayWidth = ctx.measureText(displayText).width;
           }
 
-          // رسم متن
           ctx.fillText(displayText, centerX, centerY);
 
           // متریک‌ها
-          if (metricsEl) {
-            const usableWidth = maxTextWidth;
-            const overflowPx = Math.max(
-              0,
-              Math.round(fullWidth - usableWidth)
-            );
+          const usableWidth = maxTextWidth;
+          const overflowPx = Math.max(
+            0,
+            Math.round(fullWidth - usableWidth)
+          );
 
-            metricsEl.textContent =
-              "عرض پنل: " +
-              width +
-              " px" +
-              " | ناحیه متن: " +
-              Math.round(usableWidth) +
-              " px" +
-              " | عرض متن واردشده: " +
-              Math.round(fullWidth) +
-              " px" +
-              " | عرض متن نمایش‌داده‌شده: " +
-              Math.round(displayWidth) +
-              " px" +
-              (overflowPx > 0
-                ? " | حدود " +
-                  overflowPx +
-                  " px از انتهای متن حذف شده است."
-                : " | متن کامل در پنل جا شده است.");
-          }
+          metricsEl.textContent =
+            "عرض پنل: " +
+            width +
+            " px" +
+            " | ناحیه متن: " +
+            Math.round(usableWidth) +
+            " px" +
+            " | عرض متن واردشده: " +
+            Math.round(fullWidth) +
+            " px" +
+            " | عرض متن نمایش‌داده‌شده: " +
+            Math.round(displayWidth) +
+            " px" +
+            (overflowPx > 0
+              ? " | حدود " +
+                overflowPx +
+                " px از انتهای متن حذف شده است."
+              : " | متن کامل در پنل جا شده است.");
         }
 
         function downloadImage() {
@@ -520,32 +525,27 @@
           link.click();
         }
 
-        // رویدادها
         resolutionSelect.addEventListener("change", render);
         langSelect.addEventListener("change", render);
         fontSizeSelect.addEventListener("change", render);
         colorInput.addEventListener("input", render);
         bgColorInput.addEventListener("input", render);
         textInput.addEventListener("input", render);
+        window.addEventListener("resize", render);
         downloadBtn.addEventListener("click", downloadImage);
-        window.addEventListener("resize", render); // برای تغییر جهت گوشی
 
         // رندر اولیه
         render();
 
         // Service Worker برای PWA
         if ("serviceWorker" in navigator) {
-          window.addEventListener("load", function () {
-            navigator.serviceWorker
-              .register("./service-worker.js")
-              .catch(function (err) {
-                console.log("SW registration failed:", err);
-              });
-          });
+          navigator.serviceWorker
+            .register("./service-worker.js")
+            .catch(function (err) {
+              console.log("SW registration failed:", err);
+            });
         }
-      }
-
-      window.addEventListener("load", initLedApp);
+      });
     </script>
   </body>
 </html>
