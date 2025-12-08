@@ -1,10 +1,11 @@
-const CACHE_NAME = "persian-led-pwa-v1";
+const CACHE_NAME = "persian-led-pwa-v2"; // نسخه را عوض کن تا SW جدید نصب شود
+
 const ASSETS = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png"
+  "./icons/brilup-icon-192.png",
+  "./icons/brilup-icon-512.png"
 ];
 
 self.addEventListener("install", event => {
