@@ -17,6 +17,18 @@
     <link rel="apple-touch-icon" href="./icons/brilup-icon-192.png" />
 
     <!-- Fonts -->
+    <style>
+
+    @font-face {
+      font-family: "IRANSans";
+      src: url("./fonts/IRANSans.woff2") format("woff2"),
+           url("./fonts/IRANSans.woff") format("woff"),
+           url("./fonts/IRANSans.ttf") format("truetype");
+      font-weight: normal;
+      font-style: normal;
+    }
+
+
     <link
       href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap"
       rel="stylesheet"
@@ -295,7 +307,7 @@
 
           const fontFamily =
             lang === "fa"
-              ? '"Vazirmatn", sans-serif'
+              ? '"IRANSans", sans-serif'
               : '"Roboto", sans-serif';
 
           ctx.font = fontSize + "px " + fontFamily;
@@ -305,7 +317,8 @@
           ctx.textAlign = "center";
 
           const centerX = width / 2;
-          const centerY = height / 2;
+          const centerY = height / 2 + fontSize * 0.10;
+        
 
           const marginX = 1;
           const maxTextWidth = width - marginX * 2;
