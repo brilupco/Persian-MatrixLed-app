@@ -1,7 +1,6 @@
 {
   "short_name": "BrilUp LED",
   "name": "BrilUp Persian Matrix LED Generator",
-  "orientation": "portrait",
   "icons": [
     {
       "src": "./icons/brilup-icon-192.png",
@@ -18,10 +17,9 @@
   ],
   "start_url": "./",
   "display": "standalone",
-  "orientation": "landscape",
+  "orientation": "portrait",
   "theme_color": "#000000",
   "background_color": "#000000",
-  "direction": "rtl",
+  "dir": "rtl",
   "lang": "fa-IR"
 }
-
