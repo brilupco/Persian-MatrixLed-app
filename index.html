@@ -4,23 +4,19 @@
     <meta charset="utf-8" />
     <title>Persian Matrix LED Generator</title>
 
-    <!-- Viewport -->
+    <!-- Viewport & Theme -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <!-- توضیحات -->
+    <meta name="theme-color" content="#000000" />
     <meta
       name="description"
       content="Generate LED panel text as JPEG image for different matrix sizes."
     />
 
-    <!-- فقط manifest (بدون service worker فعلاً) -->
+    <!-- PWA manifest & icon -->
     <link rel="manifest" href="./manifest.json" />
-
-    <!-- آیکون PWA / favicon -->
-    <link rel="icon" type="image/png" href="./icons/brilup-icon-192.png" />
     <link rel="apple-touch-icon" href="./icons/brilup-icon-192.png" />
 
-    <!-- فونت‌ها -->
+    <!-- Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap"
       rel="stylesheet"
@@ -34,8 +30,8 @@
       :root {
         --bg: #020617;
         --card: #0b1120;
-        --accent: #f97316; /* نارنجی */
-        --accent-soft: rgba(249, 115, 22, 0.18);
+        --accent: #22c55e;
+        --accent-soft: rgba(34, 197, 94, 0.18);
         --text: #e5e7eb;
         --muted: #9ca3af;
         --border: rgba(148, 163, 184, 0.4);
@@ -168,7 +164,7 @@
         font-weight: 600;
         cursor: pointer;
         background: radial-gradient(circle at top left, #f97316, #ea580c);
-        color: #451a03;
+        color: #000;
         margin-top: 6px;
       }
 
@@ -181,7 +177,6 @@
         font-size: 0.75rem;
         color: var(--muted);
         margin-top: 4px;
-        line-height: 1.6;
       }
 
       .preview-wrapper {
@@ -196,14 +191,15 @@
         background: radial-gradient(circle at top, #020617, #000000);
         border: 2px solid rgba(30, 64, 175, 0.7);
         position: relative;
-        overflow: hidden;
+        overflow-x: auto;
+        overflow-y: hidden;
       }
 
       .canvas-glow {
         position: absolute;
         inset: -1px;
         border-radius: inherit;
-        border: 1px solid rgba(249, 115, 22, 0.7);
+        border: 1px solid rgba(34, 197, 94, 0.7);
         opacity: 0.45;
         pointer-events: none;
       }
@@ -232,7 +228,7 @@
         height: 7px;
         border-radius: 999px;
         background: var(--accent);
-        box-shadow: 0 0 8px rgba(249, 115, 22, 0.9);
+        box-shadow: 0 0 8px rgba(34, 197, 94, 0.9);
       }
 
       footer {
@@ -241,6 +237,122 @@
         color: var(--muted);
       }
     </style>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const resolutionSelect = document.getElementById("resolution");
+        const langSelect = document.getElementById("lang");
+        const fontSizeSelect = document.getElementById("fontSize");
+        const colorInput = document.getElementById("color");
+        const bgColorInput = document.getElementById("bgColor");
+        const textInput = document.getElementById("text");
+        const canvas = document.getElementById("ledCanvas");
+        const downloadBtn = document.getElementById("downloadBtn");
+        const ctx = canvas.getContext("2d");
+
+        function getResolution() {
+          const value = resolutionSelect.value;
+          const [h, w] = value.split("x").map(Number);
+          return { width: w, height: h };
+        }
+
+        function render() {
+          const { width, height } = getResolution();
+          const lang = langSelect.value;
+
+          const rawText =
+            textInput.value ||
+            (lang === "fa" ? "متن نمونه" : "Sample");
+          let text =
+            rawText.replace(/\s+/g, " ").trim() ||
+            (lang === "fa" ? "متن نمونه" : "Sample");
+
+          const baseSize = parseInt(fontSizeSelect.value, 10) || 10;
+          const fontSize = Math.min(Math.max(baseSize, 4), height);
+
+          const color = colorInput.value || "#F97316";
+          const bgColor = bgColorInput.value || "#000000";
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const viewportWidth =
+            window.innerWidth ||
+            document.documentElement.clientWidth ||
+            400;
+
+          const displayHeight = Math.min(
+            220,
+            Math.max(80, viewportWidth * 0.35)
+          );
+          const displayWidth = displayHeight * (width / height);
+
+          canvas.style.height = displayHeight + "px";
+          canvas.style.width = displayWidth + "px";
+
+          ctx.fillStyle = bgColor;
+          ctx.fillRect(0, 0, width, height);
+
+          const fontFamily =
+            lang === "fa"
+              ? '"Vazirmatn", sans-serif'
+              : '"Roboto", sans-serif';
+
+          ctx.font = fontSize + "px " + fontFamily;
+          ctx.fillStyle = color;
+          ctx.textBaseline = "middle";
+          ctx.direction = lang === "fa" ? "rtl" : "ltr";
+          ctx.textAlign = "center";
+
+          const centerX = width / 2;
+          const centerY = height / 2;
+
+          const marginX = 1;
+          const maxTextWidth = width - marginX * 2;
+
+          let displayText = text;
+          let textWidth = ctx.measureText(displayText).width;
+
+          while (displayText.length > 0 && textWidth > maxTextWidth) {
+            displayText = displayText.slice(0, -1);
+            textWidth = ctx.measureText(displayText).width;
+          }
+
+          if (!displayText) displayText = text.charAt(0);
+
+          ctx.fillText(displayText, centerX, centerY);
+        }
+
+        function downloadImage() {
+          render();
+          const { width, height } = getResolution();
+          const link = document.createElement("a");
+          link.download = `led_${height}x${width}.jpg`;
+          link.href = canvas.toDataURL("image/jpeg", 0.95);
+          link.click();
+        }
+
+        resolutionSelect.addEventListener("change", render);
+        langSelect.addEventListener("change", render);
+        fontSizeSelect.addEventListener("change", render);
+        colorInput.addEventListener("input", render);
+        bgColorInput.addEventListener("input", render);
+        textInput.addEventListener("input", render);
+        downloadBtn.addEventListener("click", downloadImage);
+
+        render();
+
+        if ("serviceWorker" in navigator) {
+          window.addEventListener("load", () => {
+            navigator.serviceWorker
+              .register("./service-worker.js")
+              .catch((err) =>
+                console.log("SW registration failed:", err)
+              );
+          });
+        }
+      });
+    </script>
   </head>
 
   <body>
@@ -264,7 +376,7 @@
           <div
             style="
               font-size: 0.9rem;
-              color: #f97316;
+              color:#f97316;
               font-weight: 600;
             "
           >
@@ -280,7 +392,6 @@
       </header>
 
       <div class="layout">
-        <!-- تنظیمات -->
         <section class="card">
           <h2 class="section-title">تنظیمات متن و پنل</h2>
 
@@ -292,9 +403,7 @@
               placeholder="مثلاً: به فروشگاه ما خوش آمدید"
             />
             <span class="hint">
-              متن فقط یک خط است؛ اگر از عرض پنل بیشتر شود، انتهای جمله به‌طور
-              خودکار بریده می‌شود و مقدار برش در پایین پیش‌نمایش نشان داده
-              می‌شود.
+              متن فقط یک خط است؛ اگر از عرض پنل بیشتر شود، انتهای جمله به‌طور خودکار بریده می‌شود.
             </span>
           </div>
 
@@ -329,14 +438,13 @@
                 <option value="16">16</option>
               </select>
               <span class="hint">
-                اگر می‌خواهی جمله کامل نمایش داده شود، می‌توانی اندازه فونت را
-                کمتر انتخاب کنی یا متن را در چند تصویر جداگانه تقسیم کنی.
+                اگر جمله جا نشود، از انتهای آن حذف می‌شود؛ برای دیدن جمله‌ی کامل، فونت را کوچک‌تر کن یا جمله را در چند تصویر تقسیم کن.
               </span>
             </div>
 
             <div class="field">
               <label for="color">رنگ متن</label>
-              <input id="color" type="color" value="#00ff4c" />
+              <input id="color" type="color" value="#F97316" />
             </div>
 
             <div class="field">
@@ -352,7 +460,6 @@
           </div>
         </section>
 
-        <!-- پیش‌نمایش -->
         <section class="card">
           <h2 class="section-title">پیش‌نمایش پنل LED</h2>
           <div class="preview-wrapper">
@@ -360,168 +467,18 @@
               <div class="canvas-glow"></div>
               <canvas id="ledCanvas"></canvas>
             </div>
-
-            <!-- شمارنده پیکسلی -->
-            <div id="metrics" class="hint"></div>
-
             <div class="badge">
               <span class="badge-dot"></span>
-              <span>خروجی JPEG | رزولوشن واقعی پنل</span>
+              <span>خروجی JPEG | رزولوشن واقعی پنل | PWA-ready</span>
             </div>
           </div>
         </section>
       </div>
 
       <footer>
-        این ابزار صرفاً در مرورگر اجرا می‌شود؛ بعداً می‌توانیم PWA را دوباره
-        فعال کنیم.
+        می‌توانی این صفحه را روی موبایل به‌صورت PWA نصب کنی و آفلاین استفاده
+        کنی.
       </footer>
     </div>
-
-    <script>
-      window.addEventListener("load", function () {
-        const resolutionSelect = document.getElementById("resolution");
-        const langSelect = document.getElementById("lang");
-        const fontSizeSelect = document.getElementById("fontSize");
-        const colorInput = document.getElementById("color");
-        const bgColorInput = document.getElementById("bgColor");
-        const textInput = document.getElementById("text");
-        const canvas = document.getElementById("ledCanvas");
-        const downloadBtn = document.getElementById("downloadBtn");
-        const metricsEl = document.getElementById("metrics");
-
-        if (!canvas || !canvas.getContext) {
-          return;
-        }
-        const ctx = canvas.getContext("2d");
-
-        function getResolution() {
-          const value = resolutionSelect.value || "16x32";
-          const parts = value.split("x");
-          const h = parseInt(parts[0], 10) || 16;
-          const w = parseInt(parts[1], 10) || 32;
-          return { width: w, height: h };
-        }
-
-        function render() {
-          const { width, height } = getResolution();
-          const lang = langSelect.value || "fa";
-
-          const rawText =
-            textInput.value ||
-            (lang === "fa" ? "متن نمونه" : "Sample");
-          let text =
-            rawText.replace(/\s+/g, " ").trim() ||
-            (lang === "fa" ? "متن نمونه" : "Sample");
-
-          const baseSize = parseInt(fontSizeSelect.value, 10) || 10;
-          const fontSize = Math.min(Math.max(baseSize, 4), height);
-
-          const color = colorInput.value || "#00ff4c";
-          const bgColor = bgColorInput.value || "#000000";
-
-          canvas.width = width;
-          canvas.height = height;
-
-          // مقیاس نمایش بر اساس عرض صفحه (برای حالت عمودی موبایل)
-          const viewportWidth =
-            window.innerWidth ||
-            document.documentElement.clientWidth ||
-            400;
-
-          const maxDisplayWidth = Math.min(viewportWidth - 32, 600);
-          const displayWidth = maxDisplayWidth;
-          const displayHeight = displayWidth * (height / width);
-
-          canvas.style.width = displayWidth + "px";
-          canvas.style.height = displayHeight + "px";
-
-          ctx.fillStyle = bgColor;
-          ctx.fillRect(0, 0, width, height);
-
-          const fontFamily =
-            lang === "fa"
-              ? '"Vazirmatn", sans-serif'
-              : '"Roboto", sans-serif';
-
-          ctx.font = fontSize + "px " + fontFamily;
-          ctx.fillStyle = color;
-          ctx.textBaseline = "middle";
-          ctx.textAlign = "center";
-
-          const centerX = width / 2;
-          const centerY = height / 2;
-
-          const marginX = 1;
-          const maxTextWidth = width - marginX * 2;
-
-          const fullWidth = ctx.measureText(text).width;
-
-          let displayText = text;
-          let displayWidth = fullWidth;
-
-          while (
-            displayText.length > 0 &&
-            displayWidth > maxTextWidth
-          ) {
-            displayText = displayText.slice(0, -1);
-            displayWidth = ctx.measureText(displayText).width;
-          }
-
-          if (!displayText) {
-            displayText = text.charAt(0);
-            displayWidth = ctx.measureText(displayText).width;
-          }
-
-          ctx.fillText(displayText, centerX, centerY);
-
-          const usableWidth = maxTextWidth;
-          const overflowPx = Math.max(
-            0,
-            Math.round(fullWidth - usableWidth)
-          );
-
-          metricsEl.textContent =
-            "عرض پنل: " +
-            width +
-            " px" +
-            " | ناحیه متن: " +
-            Math.round(usableWidth) +
-            " px" +
-            " | عرض متن واردشده: " +
-            Math.round(fullWidth) +
-            " px" +
-            " | عرض متن نمایش‌داده‌شده: " +
-            Math.round(displayWidth) +
-            " px" +
-            (overflowPx > 0
-              ? " | حدود " +
-                overflowPx +
-                " px از انتهای متن حذف شده است."
-              : " | متن کامل در پنل جا شده است.");
-        }
-
-        function downloadImage() {
-          render();
-          const { width, height } = getResolution();
-          const link = document.createElement("a");
-          link.download = "led_" + height + "x" + width + ".jpg";
-          link.href = canvas.toDataURL("image/jpeg", 0.95);
-          link.click();
-        }
-
-        resolutionSelect.addEventListener("change", render);
-        langSelect.addEventListener("change", render);
-        fontSizeSelect.addEventListener("change", render);
-        colorInput.addEventListener("input", render);
-        bgColorInput.addEventListener("input", render);
-        textInput.addEventListener("input", render);
-        window.addEventListener("resize", render);
-        downloadBtn.addEventListener("click", downloadImage);
-
-        // رندر اولیه
-        render();
-      });
-    </script>
   </body>
 </html>
