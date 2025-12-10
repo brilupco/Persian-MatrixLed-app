@@ -19,7 +19,13 @@
     <link rel="manifest" href="./manifest.json" />
     <link rel="apple-touch-icon" href="./icons/brilup-icon-192.png" />
 
-    <!-- فقط IRANSansWeb_Black محلی -->
+    <!-- Vazirmatn برای وقتی کاربر این فونت را انتخاب می‌کند -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- IRANSansWeb_Black محلی -->
     <style>
       @font-face {
         font-family: "IRANSansBlack";
@@ -268,6 +274,7 @@
         const textInput = document.getElementById("text");
         const canvas = document.getElementById("ledCanvas");
         const downloadBtn = document.getElementById("downloadBtn");
+        const fontFamilySelect = document.getElementById("fontFamily");
         const ctx = canvas.getContext("2d");
 
         function getResolution() {
@@ -313,7 +320,9 @@
           ctx.fillStyle = bgColor;
           ctx.fillRect(0, 0, width, height);
 
-          const fontFamily = '"IRANSansBlack", sans-serif';
+          // انتخاب فونت از روی dropdown
+          const selectedFont = fontFamilySelect.value || "IRANSansBlack";
+          const fontFamily = `"${selectedFont}", sans-serif`;
 
           ctx.font = fontSize + "px " + fontFamily;
           ctx.fillStyle = color;
@@ -322,7 +331,7 @@
           ctx.textAlign = "center";
 
           const centerX = width / 2;
-          const centerY = height / 2 - fontSize * 0.05;
+          const centerY = height / 2 - fontSize * 0.05; // کمی بالاتر از وسط
 
           const marginX = 1;
           const maxTextWidth = width - marginX * 2;
@@ -355,6 +364,7 @@
         colorInput.addEventListener("input", render);
         bgColorInput.addEventListener("input", render);
         textInput.addEventListener("input", render);
+        fontFamilySelect.addEventListener("change", render);
         downloadBtn.addEventListener("click", downloadImage);
 
         render();
@@ -443,6 +453,17 @@
                 <option value="en">English</option>
               </select>
             </div>
+
+            <div class="field">
+              <label for="fontFamily">فونت متن</label>
+              <select id="fontFamily">
+                <option value="IRANSansBlack" selected>IRANSans (Bold)</option>
+                <option value="Vazirmatn">Vazirmatn</option>
+              </select>
+              <span class="hint">
+                انتخاب فونت فقط روی متن پنل LED اثر می‌گذارد.
+              </span>
+            </div>
           </div>
 
           <div class="inline-fields">
@@ -499,4 +520,3 @@
     </div>
   </body>
 </html>
-
