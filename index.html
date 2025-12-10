@@ -31,6 +31,14 @@
         font-weight: 900;
         font-style: normal;
       }
+      @font-face {
+  font-family: "IRANSansBlack";
+  src: url("./fonts/IRANSansWeb_Black.woff2") format("woff2"),
+       url("./fonts/IRANSansWeb_Black.woff") format("woff"),
+       url("./fonts/IRANSansWeb_Black.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
     
     </style>
 
@@ -455,7 +463,7 @@
               <label for="fontFamily">فونت متن</label>
               <select id="fontFamily">
                 <option value="BTITRBD" selected> BTITRBD </option>
-               
+                <option value="IRANSansBlack" selected>IRANSans Black</option>
               </select>
               <span class="hint">
                 انتخاب فونت فقط روی متن پنل LED اثر می‌گذارد.
@@ -517,6 +525,7 @@
     </div>
   </body>
 </html>
+
 
 
 
