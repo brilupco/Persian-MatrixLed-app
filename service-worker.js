@@ -1,9 +1,12 @@
-const CACHE_NAME = "persian-led-pwa-v2"; // نسخه را عوض کن تا SW جدید نصب شود
+const CACHE_NAME = "persian-led-pwa-v3";
 
 const ASSETS = [
   "./",
   "./index.html",
   "./manifest.json",
+  "./fonts/IRANSansWeb_Black.woff2",
+  "./fonts/IRANSansWeb_Black.woff",
+  "./fonts/IRANSansWeb_Black.ttf",
   "./icons/brilup-icon-192.png",
   "./icons/brilup-icon-512.png"
 ];
