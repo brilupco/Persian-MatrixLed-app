@@ -5,7 +5,10 @@
     <title>Persian Matrix LED Generator</title>
 
     <!-- Viewport & Theme -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
     <meta name="theme-color" content="#000000" />
     <meta
       name="description"
@@ -16,18 +19,7 @@
     <link rel="manifest" href="./manifest.json" />
     <link rel="apple-touch-icon" href="./icons/brilup-icon-192.png" />
 
-    <!-- Google Fonts (فقط برای انگلیسی) -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- IRANSansBlack محلی -->
-
+    <!-- فقط IRANSansWeb_Black محلی -->
     <style>
       @font-face {
         font-family: "IRANSansBlack";
@@ -43,7 +35,7 @@
       :root {
         --bg: #020617;
         --card: #0b1120;
-        --accent: #22c55e; /* هنوز برای بعضی قسمت‌ها سبز است، می‌توانی بعداً نارنجی کنی */
+        --accent: #22c55e;
         --accent-soft: rgba(34, 197, 94, 0.18);
         --text: #e5e7eb;
         --muted: #9ca3af;
@@ -59,8 +51,7 @@
         min-height: 100vh;
         background: radial-gradient(circle at top, #1f2937, #020617);
         color: var(--text);
-        font-family: "IRANSansBlack", "Vazirmatn", system-ui, -apple-system, BlinkMacSystemFont,
-          "Segoe UI", sans-serif;
+        font-family: "IRANSansBlack", sans-serif;
         display: flex;
         justify-content: center;
         align-items: stretch;
@@ -250,7 +241,6 @@
         color: var(--muted);
       }
 
-      /* اگر در حالت landscape باز شد، پیام بده که گوشی را بچرخاند */
       @media screen and (orientation: landscape) {
         body::before {
           content: "لطفاً گوشی را در حالت عمودی قرار دهید";
@@ -323,10 +313,7 @@
           ctx.fillStyle = bgColor;
           ctx.fillRect(0, 0, width, height);
 
-          const fontFamily =
-            lang === "fa"
-              ? '"IRANSansBlack","Vazirmatn",sans-serif'
-              : '"Roboto", sans-serif';
+          const fontFamily = '"IRANSansBlack", sans-serif';
 
           ctx.font = fontSize + "px " + fontFamily;
           ctx.fillStyle = color;
